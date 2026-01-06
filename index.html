@@ -1,0 +1,1685 @@
+<!doctype html>
+<html lang="id" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Skrining Kesehatan Pasien</title>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .loading-spinner {
+      border: 3px solid #f3f4f6;
+      border-top: 3px solid #3b82f6;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full bg-gradient-to-br from-blue-50 to-indigo-100">
+  <div id="app" class="h-full w-full overflow-auto"><!-- Login Screen -->
+   <div id="loginScreen" class="min-h-full flex items-center justify-center p-6">
+    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md fade-in">
+     <div class="text-center mb-8">
+      <div class="bg-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+       <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+       </svg>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2" id="judulSistem">Sistem Skrining Kesehatan Pasien</h1>
+      <p class="text-gray-600" id="deskripsiSistem">Layanan skrining kesehatan untuk pasien</p>
+     </div>
+     <div class="space-y-4"><button id="btnLoginPasien" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"> Login Pasien </button> <button id="btnDaftarPasien" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"> Daftar Pasien Baru </button> <button id="btnLoginAdmin" class="w-full bg-gray-700 hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"> Login Admin </button>
+     </div>
+    </div>
+   </div><!-- Registration Form -->
+   <div id="registrationScreen" class="hidden min-h-full p-6">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8 fade-in">
+     <h2 class="text-2xl font-bold text-gray-800 mb-6">Pendaftaran Pasien Baru</h2>
+     <form id="registrationForm" class="space-y-4">
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">NIK (Nomor Induk Kependudukan)</label> <input type="text" id="regNik" required pattern="[0-9]{16}" maxlength="16" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="16 digit NIK">
+      </div>
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label> <input type="text" id="regNama" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Lahir</label> <input type="date" id="regTanggalLahir" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">Jenis Kelamin</label> <select id="regJenisKelamin" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"> <option value="">Pilih Jenis Kelamin</option> <option value="Laki-laki">Laki-laki</option> <option value="Perempuan">Perempuan</option> </select>
+      </div>
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">Alamat</label> <textarea id="regAlamat" required rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+      </div>
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">Nomor Telepon</label> <input type="tel" id="regTelepon" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">Email</label> <input type="email" id="regEmail" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      <div class="flex gap-4 mt-6"><button type="submit" id="btnDaftar" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center"> Daftar </button> <button type="button" id="btnCancelRegister" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"> Batal </button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Patient Login Form -->
+   <div id="patientLoginScreen" class="hidden min-h-full flex items-center justify-center p-6">
+    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md fade-in">
+     <h2 class="text-2xl font-bold text-gray-800 mb-6">Login Pasien</h2>
+     <form id="patientLoginForm" class="space-y-4">
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">NIK</label> <input type="text" id="loginNik" required pattern="[0-9]{16}" maxlength="16" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Lahir</label> <input type="date" id="loginTanggalLahir" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      <div id="loginError" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm"></div>
+      <div class="flex gap-4 mt-6"><button type="submit" id="btnLogin" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center"> Login </button> <button type="button" id="btnCancelLogin" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"> Batal </button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Admin Login Form -->
+   <div id="adminLoginScreen" class="hidden min-h-full flex items-center justify-center p-6">
+    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md fade-in">
+     <h2 class="text-2xl font-bold text-gray-800 mb-6">Login Admin</h2>
+     <form id="adminLoginForm" class="space-y-4">
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">Username</label> <input type="text" id="adminUsername" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">Password</label> <input type="password" id="adminPassword" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      <div id="adminLoginError" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm"></div>
+      <div class="flex gap-4 mt-6"><button type="submit" id="btnAdminLogin" class="flex-1 bg-gray-700 hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center"> Login </button> <button type="button" id="btnCancelAdminLogin" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"> Batal </button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Patient Dashboard -->
+   <div id="patientDashboard" class="hidden min-h-full p-6">
+    <div class="max-w-4xl mx-auto">
+     <div class="bg-white rounded-2xl shadow-xl p-8 mb-6 fade-in">
+      <div class="flex justify-between items-center mb-6">
+       <div>
+        <h2 class="text-2xl font-bold text-gray-800">Dashboard Pasien</h2>
+        <p class="text-gray-600" id="welcomeMessage"></p>
+       </div><button id="btnLogoutPatient" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"> Keluar </button>
+      </div>
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+       <h3 class="font-semibold text-blue-800 mb-2">Informasi Penting</h3>
+       <p class="text-sm text-blue-700">Setiap jenis skrining hanya dapat dilakukan sekali dalam setahun. Pastikan Anda memilih skrining yang sesuai dengan kebutuhan Anda.</p>
+      </div>
+      <h3 class="text-xl font-bold text-gray-800 mb-4">Pilih Jenis Skrining</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4"><button class="screening-card bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-6 rounded-xl transition-all duration-200 transform hover:scale-105" data-screening="Skrining Diabetes">
+        <div class="text-lg font-bold mb-2">
+         Skrining Diabetes
+        </div><p class="text-sm text-blue-100">Pemeriksaan kadar gula darah dan faktor risiko diabetes</p></button> <button class="screening-card bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-6 rounded-xl transition-all duration-200 transform hover:scale-105" data-screening="Skrining Hipertensi">
+        <div class="text-lg font-bold mb-2">
+         Skrining Hipertensi
+        </div><p class="text-sm text-green-100">Pemeriksaan tekanan darah dan risiko penyakit jantung</p></button> <button class="screening-card bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white p-6 rounded-xl transition-all duration-200 transform hover:scale-105" data-screening="Skrining Kolesterol">
+        <div class="text-lg font-bold mb-2">
+         Skrining Kolesterol
+        </div><p class="text-sm text-purple-100">Pemeriksaan kadar kolesterol dan lemak dalam darah</p></button> <button class="screening-card bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white p-6 rounded-xl transition-all duration-200 transform hover:scale-105" data-screening="Skrining Kanker">
+        <div class="text-lg font-bold mb-2">
+         Skrining Kanker
+        </div><p class="text-sm text-red-100">Deteksi dini berbagai jenis kanker</p></button>
+      </div>
+     </div>
+     <div class="bg-white rounded-2xl shadow-xl p-8">
+      <h3 class="text-xl font-bold text-gray-800 mb-4">Riwayat Skrining Anda</h3>
+      <div id="patientHistory" class="space-y-3"></div>
+     </div>
+    </div>
+   </div><!-- Screening Form -->
+   <div id="screeningForm" class="hidden min-h-full p-6">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8 fade-in">
+     <h2 class="text-2xl font-bold text-gray-800 mb-2" id="screeningTitle"></h2>
+     <p class="text-gray-600 mb-6">Jawab pertanyaan berikut dengan jujur dan lengkap</p>
+     <form id="screeningQuestionsForm" class="space-y-6">
+      <div id="questionContainer"><!-- Pertanyaan akan dimuat secara dinamis berdasarkan jenis skrining -->
+      </div>
+      <div class="flex gap-4 mt-6"><button type="submit" id="btnSubmitScreening" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center"> Kirim Skrining </button> <button type="button" id="btnCancelScreening" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"> Batal </button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Admin Dashboard -->
+   <div id="adminDashboard" class="hidden min-h-full p-6">
+    <div class="max-w-7xl mx-auto">
+     <div class="bg-white rounded-2xl shadow-xl p-8 mb-6 fade-in">
+      <div class="flex justify-between items-center mb-6">
+       <h2 class="text-2xl font-bold text-gray-800">Dashboard Admin</h2><button id="btnLogoutAdmin" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"> Keluar </button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+       <div class="bg-green-100 rounded-lg p-4">
+        <div class="text-sm text-green-700 font-medium">
+         Skrining Selesai
+        </div>
+        <div class="text-3xl font-bold text-green-900" id="completedScreenings">
+         0
+        </div>
+       </div>
+       <div class="bg-purple-100 rounded-lg p-4">
+        <div class="text-sm text-purple-700 font-medium">
+         Skrining Bulan Ini
+        </div>
+        <div class="text-3xl font-bold text-purple-900" id="monthlyScreenings">
+         0
+        </div>
+       </div>
+      </div>
+      <div class="mb-4 flex gap-2"><input type="text" id="searchPatient" placeholder="Cari berdasarkan NIK atau Nama..." class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"> <select id="filterScreening" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"> <option value="">Semua Skrining</option> <option value="Skrining Diabetes">Skrining Diabetes</option> <option value="Skrining Hipertensi">Skrining Hipertensi</option> <option value="Skrining Kolesterol">Skrining Kolesterol</option> <option value="Skrining Kanker">Skrining Kanker</option> </select>
+      </div>
+      <div id="adminTableBody" class="space-y-4">
+      </div>
+     </div>
+    </div>
+   </div><!-- Screening Detail Modal -->
+   <div id="detailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-3xl w-full max-h-full overflow-y-auto fade-in">
+     <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">Detail Skrining Pasien</h2><button id="btnCloseModal" class="text-gray-500 hover:text-gray-700">
+       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+       </svg></button>
+     </div>
+     <div id="modalContent"></div>
+    </div>
+   </div><!-- Edit Patient Modal -->
+   <div id="editPatientModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full max-h-full overflow-y-auto fade-in">
+     <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">Edit Data Pasien</h2><button id="btnCloseEditModal" class="text-gray-500 hover:text-gray-700">
+       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+       </svg></button>
+     </div>
+     <form id="editPatientForm" class="space-y-4">
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">NIK (Tidak dapat diubah)</label> <input type="text" id="editNik" disabled class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed">
+      </div>
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label> <input type="text" id="editNama" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Lahir</label> <input type="date" id="editTanggalLahir" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">Jenis Kelamin</label> <select id="editJenisKelamin" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"> <option value="">Pilih Jenis Kelamin</option> <option value="Laki-laki">Laki-laki</option> <option value="Perempuan">Perempuan</option> </select>
+      </div>
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">Alamat</label> <textarea id="editAlamat" required rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+      </div>
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">Nomor Telepon</label> <input type="tel" id="editTelepon" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      <div><label class="block text-sm font-medium text-gray-700 mb-2">Email</label> <input type="email" id="editEmail" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      <div class="flex gap-4 mt-6"><button type="submit" id="btnSaveEdit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center"> Simpan Perubahan </button> <button type="button" id="btnCancelEdit" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"> Batal </button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Edit Screening Modal -->
+   <div id="editScreeningModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full max-h-full overflow-y-auto fade-in">
+     <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">Edit Hasil Skrining</h2><button id="btnCloseEditScreeningModal" class="text-gray-500 hover:text-gray-700">
+       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+       </svg></button>
+     </div>
+     <form id="editScreeningForm" class="space-y-6">
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+       <div class="text-sm font-medium text-blue-900">
+        Pasien: <span id="editScreeningPatient"></span>
+       </div>
+       <div class="text-sm text-blue-700">
+        Jenis: <span id="editScreeningType"></span>
+       </div>
+      </div><!-- Pertanyaan akan dimuat secara dinamis di sini -->
+      <div class="flex gap-4 mt-6"><button type="submit" id="btnSaveScreeningEdit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center"> Simpan Perubahan </button> <button type="button" id="btnCancelScreeningEdit" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"> Batal </button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Delete Confirmation Modal -->
+   <div id="deleteConfirmModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full fade-in">
+     <div class="text-center mb-6">
+      <div class="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+       <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+       </svg>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-800 mb-2">Konfirmasi Hapus</h2>
+      <p class="text-gray-600" id="deleteMessage">Apakah Anda yakin ingin menghapus data ini?</p>
+     </div>
+     <div class="flex gap-4"><button id="btnConfirmDelete" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center"> Ya, Hapus </button> <button id="btnCancelDelete" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"> Batal </button>
+     </div>
+    </div>
+   </div><!-- Success Toast -->
+   <div id="successToast" class="hidden fixed top-6 right-6 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 fade-in">
+    <div class="flex items-center gap-3">
+     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+     </svg><span id="toastMessage"></span>
+    </div>
+   </div><!-- Footer -->
+   <div id="footer" class="text-center py-4 text-gray-600 text-sm">
+    <p id="footerText">© 2024 Sistem Skrining Kesehatan</p>
+   </div>
+  </div>
+  <script>
+    // ==========================================
+    // BAGIAN 1: VARIABEL GLOBAL
+    // ==========================================
+    // Menyimpan semua data pasien dan skrining
+    let allData = [];
+    
+    // Menyimpan informasi user yang sedang login (pasien)
+    let currentUser = null;
+    
+    // Menyimpan jenis skrining yang dipilih pasien
+    let currentScreeningType = '';
+    
+    // Status login admin (true/false)
+    let adminLoggedIn = false;
+    
+    // ID pasien yang sedang diedit di modal edit
+    let editingPatientId = null;
+    
+    // ID skrining yang sedang diedit di modal edit
+    let editingScreeningId = null;
+    
+    // ID item yang akan dihapus (bisa ID skrining atau NIK pasien)
+    let deletingItemId = null;
+    
+    // Tipe data yang akan dihapus: 'screening' atau 'patient'
+    let deletingType = 'screening';
+    
+    // Status SDK ready
+    let sdkReady = false;
+
+    // ==========================================
+    // BAGIAN 1.5: DATABASE PERTANYAAN SKRINING
+    // ==========================================
+    /**
+     * KEGUNAAN: Menyimpan pertanyaan berbeda untuk setiap jenis skrining
+     * CARA EDIT: Tambahkan jenis skrining baru atau ubah pertanyaan yang ada
+     * FORMAT: Setiap jenis skrining memiliki array pertanyaan dengan id, label, type, dan options
+     * TYPE: 'radio' untuk pilihan tunggal, 'checkbox' untuk pilihan ganda
+     */
+    const screeningQuestions = {
+      'Skrining Diabetes': [
+        { 
+          id: 'q1', 
+          label: 'Apakah ada riwayat diabetes dalam keluarga Anda?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Tidak ada',
+            'Ya, orang tua (ayah/ibu)',
+            'Ya, saudara kandung',
+            'Ya, kakek/nenek',
+            'Ya, lebih dari satu anggota keluarga'
+          ]
+        },
+        { 
+          id: 'q2', 
+          label: 'Apakah Anda sering merasa haus berlebihan atau sering buang air kecil?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Tidak pernah',
+            'Jarang (1-2 kali per bulan)',
+            'Kadang-kadang (1-2 kali per minggu)',
+            'Sering (hampir setiap hari)',
+            'Sangat sering (setiap hari)'
+          ]
+        },
+        { 
+          id: 'q3', 
+          label: 'Apakah Anda mengalami penurunan berat badan tanpa sebab yang jelas?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Tidak',
+            'Ya, turun 1-3 kg dalam 6 bulan terakhir',
+            'Ya, turun 3-5 kg dalam 6 bulan terakhir',
+            'Ya, turun lebih dari 5 kg dalam 6 bulan terakhir'
+          ]
+        },
+        { 
+          id: 'q4', 
+          label: 'Berapa kadar gula darah terakhir Anda (jika pernah diperiksa)?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Belum pernah diperiksa',
+            'Normal (< 100 mg/dL saat puasa)',
+            'Pre-diabetes (100-125 mg/dL saat puasa)',
+            'Diabetes (> 126 mg/dL saat puasa)',
+            'Tidak ingat hasilnya'
+          ]
+        },
+        { 
+          id: 'q5', 
+          label: 'Bagaimana pola makan Anda sehari-hari?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Sangat sehat (banyak sayur, buah, rendah gula)',
+            'Cukup sehat (kadang makan sayur dan buah)',
+            'Kurang sehat (jarang makan sayur dan buah)',
+            'Tidak sehat (sering makan makanan manis dan berlemak)'
+          ]
+        },
+        { 
+          id: 'q6', 
+          label: 'Apakah Anda rutin berolahraga?', 
+          type: 'radio',
+          required: false,
+          options: [
+            'Ya, setiap hari (> 30 menit)',
+            'Ya, 3-5 kali per minggu',
+            'Ya, 1-2 kali per minggu',
+            'Jarang berolahraga',
+            'Tidak pernah berolahraga'
+          ]
+        }
+      ],
+      'Skrining Hipertensi': [
+        { 
+          id: 'q1', 
+          label: 'Apakah ada riwayat hipertensi atau penyakit jantung dalam keluarga?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Tidak ada',
+            'Ya, orang tua (ayah/ibu)',
+            'Ya, saudara kandung',
+            'Ya, kakek/nenek',
+            'Ya, lebih dari satu anggota keluarga'
+          ]
+        },
+        { 
+          id: 'q2', 
+          label: 'Apakah Anda sering mengalami sakit kepala, pusing, atau pandangan kabur?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Tidak pernah',
+            'Jarang (1-2 kali per bulan)',
+            'Kadang-kadang (1-2 kali per minggu)',
+            'Sering (hampir setiap hari)',
+            'Sangat sering (setiap hari)'
+          ]
+        },
+        { 
+          id: 'q3', 
+          label: 'Berapa tekanan darah terakhir Anda (jika pernah diperiksa)?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Belum pernah diperiksa',
+            'Normal (< 120/80 mmHg)',
+            'Pre-hipertensi (120-139/80-89 mmHg)',
+            'Hipertensi (≥ 140/90 mmHg)',
+            'Tidak ingat hasilnya'
+          ]
+        },
+        { 
+          id: 'q4', 
+          label: 'Apakah Anda sering mengonsumsi makanan asin atau makanan tinggi natrium?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Tidak pernah',
+            'Jarang (1-2 kali per bulan)',
+            'Kadang-kadang (1-2 kali per minggu)',
+            'Sering (3-5 kali per minggu)',
+            'Sangat sering (hampir setiap hari)'
+          ]
+        },
+        { 
+          id: 'q5', 
+          label: 'Apakah Anda merokok atau mengonsumsi alkohol?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Tidak merokok dan tidak minum alkohol',
+            'Pernah merokok/minum, tapi sudah berhenti',
+            'Jarang (1-2 kali per bulan)',
+            'Kadang-kadang (1-2 kali per minggu)',
+            'Sering (hampir setiap hari)'
+          ]
+        },
+        { 
+          id: 'q6', 
+          label: 'Apakah Anda mengalami stres berkepanjangan atau sulit tidur?', 
+          type: 'radio',
+          required: false,
+          options: [
+            'Tidak pernah',
+            'Jarang',
+            'Kadang-kadang',
+            'Sering',
+            'Sangat sering'
+          ]
+        }
+      ],
+      'Skrining Kolesterol': [
+        { 
+          id: 'q1', 
+          label: 'Apakah ada riwayat kolesterol tinggi atau penyakit jantung dalam keluarga?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Tidak ada',
+            'Ya, orang tua (ayah/ibu)',
+            'Ya, saudara kandung',
+            'Ya, kakek/nenek',
+            'Ya, lebih dari satu anggota keluarga'
+          ]
+        },
+        { 
+          id: 'q2', 
+          label: 'Berapa hasil pemeriksaan kolesterol total terakhir Anda (jika pernah diperiksa)?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Belum pernah diperiksa',
+            'Normal (< 200 mg/dL)',
+            'Batas tinggi (200-239 mg/dL)',
+            'Tinggi (≥ 240 mg/dL)',
+            'Tidak ingat hasilnya'
+          ]
+        },
+        { 
+          id: 'q3', 
+          label: 'Seberapa sering Anda mengonsumsi makanan berlemak (gorengan, daging berlemak, santan)?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Tidak pernah',
+            'Jarang (1-2 kali per bulan)',
+            'Kadang-kadang (1-2 kali per minggu)',
+            'Sering (3-5 kali per minggu)',
+            'Sangat sering (hampir setiap hari)'
+          ]
+        },
+        { 
+          id: 'q4', 
+          label: 'Apakah Anda rutin mengonsumsi sayur dan buah setiap hari?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Ya, setiap hari (5 porsi atau lebih)',
+            'Ya, hampir setiap hari (3-4 porsi)',
+            'Kadang-kadang (1-2 porsi)',
+            'Jarang',
+            'Tidak pernah'
+          ]
+        },
+        { 
+          id: 'q5', 
+          label: 'Berapa kali dalam seminggu Anda berolahraga?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Setiap hari (7 kali per minggu)',
+            '5-6 kali per minggu',
+            '3-4 kali per minggu',
+            '1-2 kali per minggu',
+            'Tidak pernah'
+          ]
+        },
+        { 
+          id: 'q6', 
+          label: 'Apakah Anda sedang mengonsumsi obat penurun kolesterol atau suplemen?', 
+          type: 'radio',
+          required: false,
+          options: [
+            'Tidak',
+            'Ya, obat penurun kolesterol dari dokter',
+            'Ya, suplemen herbal',
+            'Ya, keduanya (obat dan suplemen)'
+          ]
+        }
+      ],
+      'Skrining Kanker': [
+        { 
+          id: 'q1', 
+          label: 'Apakah ada riwayat kanker dalam keluarga?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Tidak ada',
+            'Ya, orang tua (ayah/ibu)',
+            'Ya, saudara kandung',
+            'Ya, kakek/nenek',
+            'Ya, lebih dari satu anggota keluarga'
+          ]
+        },
+        { 
+          id: 'q2', 
+          label: 'Apakah Anda menemukan benjolan, perubahan bentuk, atau luka yang tidak kunjung sembuh?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Tidak ada',
+            'Ya, benjolan kecil',
+            'Ya, benjolan besar atau bertambah besar',
+            'Ya, luka yang tidak sembuh lebih dari 3 minggu',
+            'Ya, lebih dari satu gejala'
+          ]
+        },
+        { 
+          id: 'q3', 
+          label: 'Apakah Anda mengalami penurunan berat badan drastis tanpa sebab atau kehilangan nafsu makan?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Tidak',
+            'Ya, turun 1-3 kg dalam 3 bulan terakhir',
+            'Ya, turun 3-5 kg dalam 3 bulan terakhir',
+            'Ya, turun lebih dari 5 kg dalam 3 bulan terakhir'
+          ]
+        },
+        { 
+          id: 'q4', 
+          label: 'Apakah Anda pernah terpapar asap rokok, zat kimia berbahaya, atau radiasi dalam jangka panjang?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Tidak pernah',
+            'Ya, perokok aktif',
+            'Ya, perokok pasif (terpapar asap rokok)',
+            'Ya, bekerja dengan zat kimia berbahaya',
+            'Ya, lebih dari satu paparan'
+          ]
+        },
+        { 
+          id: 'q5', 
+          label: 'Untuk wanita: Apakah Anda rutin melakukan pemeriksaan payudara sendiri (SADARI) atau pap smear?', 
+          type: 'radio',
+          required: true,
+          options: [
+            'Ya, rutin setiap bulan (SADARI)',
+            'Ya, pernah pap smear dalam 3 tahun terakhir',
+            'Kadang-kadang saja',
+            'Jarang',
+            'Tidak pernah / Tidak berlaku (laki-laki)'
+          ]
+        },
+        { 
+          id: 'q6', 
+          label: 'Apakah ada keluhan lain seperti batuk berkepanjangan, darah dalam urin/feses, atau kesulitan menelan?', 
+          type: 'radio',
+          required: false,
+          options: [
+            'Tidak ada keluhan',
+            'Ya, batuk lebih dari 3 minggu',
+            'Ya, darah dalam urin atau feses',
+            'Ya, kesulitan menelan',
+            'Ya, lebih dari satu keluhan'
+          ]
+        }
+      ]
+    };
+
+    /**
+     * FUNGSI: loadScreeningQuestions(screeningType)
+     * KEGUNAAN: Menampilkan pertanyaan sesuai dengan jenis skrining yang dipilih
+     * PARAMETER: screeningType - Jenis skrining (contoh: 'Skrining Diabetes')
+     */
+    function loadScreeningQuestions(screeningType) {
+      const container = document.getElementById('questionContainer');
+      const questions = screeningQuestions[screeningType] || [];
+      
+      container.innerHTML = questions.map(q => `
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-3">
+            ${q.label}
+            ${q.required ? '<span class="text-red-500">*</span>' : ''}
+          </label>
+          <div class="space-y-2">
+            ${q.options.map((option, index) => `
+              <label class="flex items-start p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer border border-gray-200 transition-colors">
+                <input type="${q.type}" name="${q.id}" value="${option}" ${q.required ? 'required' : ''} class="mt-1 mr-3 w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500">
+                <span class="text-sm text-gray-700 flex-1">${option}</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ==========================================
+    // BAGIAN 2: INISIALISASI DATA SDK
+    // ==========================================
+    
+    /**
+     * FUNGSI: Data Handler - Mengelola perubahan data dari Canva Sheet
+     * KEGUNAAN: Dipanggil otomatis ketika data di Sheet berubah
+     */
+    const dataHandler = {
+      onDataChanged(data) {
+        // Update data lokal dengan data dari Sheet
+        allData = data;
+        
+        // Update tampilan berdasarkan halaman yang aktif
+        if (adminLoggedIn) {
+          updateAdminDashboard();
+        } else if (currentUser) {
+          updatePatientHistory();
+        }
+      }
+    };
+
+    /**
+     * FUNGSI: Inisialisasi Data SDK
+     * KEGUNAAN: Menghubungkan aplikasi dengan Canva Sheet untuk penyimpanan permanen
+     */
+    async function initializeDataSDK() {
+      try {
+        const result = await window.dataSdk.init(dataHandler);
+        if (result.isOk) {
+          sdkReady = true;
+          console.log('Data SDK berhasil diinisialisasi');
+        } else {
+          console.error('Gagal menginisialisasi Data SDK:', result.error);
+          showToast('Gagal menghubungkan ke sistem penyimpanan');
+        }
+      } catch (error) {
+        console.error('Error saat inisialisasi SDK:', error);
+      }
+    }
+
+    // Inisialisasi SDK saat halaman dimuat
+    initializeDataSDK();
+
+    // ==========================================
+    // BAGIAN 3: FUNGSI TAMPILAN & NAVIGASI
+    // ==========================================
+    
+    /**
+     * FUNGSI: showScreen(screenId)
+     * KEGUNAAN: Menampilkan satu layar dan menyembunyikan layar lainnya
+     * PARAMETER: screenId - ID dari layar yang ingin ditampilkan
+     * CONTOH: showScreen('loginScreen') akan menampilkan layar login
+     */
+    function showScreen(screenId) {
+      const screens = ['loginScreen', 'registrationScreen', 'patientLoginScreen', 'adminLoginScreen', 'patientDashboard', 'screeningForm', 'adminDashboard'];
+      screens.forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(screenId).classList.remove('hidden');
+    }
+
+    /**
+     * FUNGSI: showToast(message)
+     * KEGUNAAN: Menampilkan notifikasi sukses di pojok kanan atas
+     * PARAMETER: message - Teks pesan yang ingin ditampilkan
+     * DURASI: Notifikasi akan hilang otomatis setelah 3 detik
+     */
+    function showToast(message) {
+      const toast = document.getElementById('successToast');
+      const toastMessage = document.getElementById('toastMessage');
+      toastMessage.textContent = message;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    }
+
+    /**
+     * FUNGSI: showLoading(button)
+     * KEGUNAAN: Menampilkan loading spinner di tombol dan menonaktifkan tombol
+     * PARAMETER: button - Elemen tombol yang akan diberi loading
+     * RETURN: Fungsi untuk menghilangkan loading (panggil fungsi yang dikembalikan untuk stop loading)
+     * CONTOH: const hideLoading = showLoading(btnSubmit); 
+     *         // lakukan sesuatu
+     *         hideLoading(); // hilangkan loading
+     */
+    function showLoading(button) {
+      const originalText = button.textContent;
+      button.disabled = true;
+      button.innerHTML = '<div class="loading-spinner mx-auto"></div>';
+      return () => {
+        button.disabled = false;
+        button.textContent = originalText;
+      };
+    }
+
+    // ==========================================
+    // BAGIAN 4: EVENT LISTENER TOMBOL NAVIGASI UTAMA
+    // ==========================================
+    
+    /**
+     * TOMBOL: Login Pasien
+     * KEGUNAAN: Menampilkan form login pasien
+     */
+    document.getElementById('btnLoginPasien').addEventListener('click', () => {
+      showScreen('patientLoginScreen');
+    });
+
+    /**
+     * TOMBOL: Daftar Pasien Baru
+     * KEGUNAAN: Menampilkan form pendaftaran pasien baru
+     */
+    document.getElementById('btnDaftarPasien').addEventListener('click', () => {
+      showScreen('registrationScreen');
+    });
+
+    /**
+     * TOMBOL: Login Admin
+     * KEGUNAAN: Menampilkan form login admin
+     */
+    document.getElementById('btnLoginAdmin').addEventListener('click', () => {
+      showScreen('adminLoginScreen');
+    });
+
+    /**
+     * TOMBOL: Batal Registrasi
+     * KEGUNAAN: Membatalkan pendaftaran dan kembali ke layar login utama
+     */
+    document.getElementById('btnCancelRegister').addEventListener('click', () => {
+      document.getElementById('registrationForm').reset();
+      showScreen('loginScreen');
+    });
+
+    /**
+     * TOMBOL: Batal Login Pasien
+     * KEGUNAAN: Membatalkan login pasien dan kembali ke layar login utama
+     */
+    document.getElementById('btnCancelLogin').addEventListener('click', () => {
+      document.getElementById('patientLoginForm').reset();
+      document.getElementById('loginError').classList.add('hidden');
+      showScreen('loginScreen');
+    });
+
+    /**
+     * TOMBOL: Batal Login Admin
+     * KEGUNAAN: Membatalkan login admin dan kembali ke layar login utama
+     */
+    document.getElementById('btnCancelAdminLogin').addEventListener('click', () => {
+      document.getElementById('adminLoginForm').reset();
+      document.getElementById('adminLoginError').classList.add('hidden');
+      showScreen('loginScreen');
+    });
+
+    // ==========================================
+    // BAGIAN 5: FORM PENDAFTARAN PASIEN BARU
+    // ==========================================
+    
+    /**
+     * FORM: Pendaftaran Pasien Baru
+     * KEGUNAAN: Menangani proses pendaftaran pasien baru
+     * PROSES:
+     * 1. Cek apakah sudah mencapai limit 999 data
+     * 2. Cek apakah NIK sudah terdaftar
+     * 3. Jika valid, tambahkan data pasien baru ke Canva Sheet
+     * 4. Auto-login pasien yang baru daftar
+     * 5. Arahkan ke dashboard pasien
+     */
+    document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (!sdkReady) {
+        showToast('Sistem belum siap. Silakan tunggu sebentar...');
+        return;
+      }
+      
+      // Cek limit maksimal data
+      if (allData.length >= 999) {
+        showToast('Batas maksimum 999 data tercapai. Hubungi administrator.');
+        return;
+      }
+      
+      // Tampilkan loading di tombol Daftar
+      const hideLoading = showLoading(document.getElementById('btnDaftar'));
+      
+      // Ambil NIK dari form
+      const nik = document.getElementById('regNik').value;
+      
+      // Cek apakah NIK sudah terdaftar
+      const existingPatient = allData.find(d => d.nik === nik && d.role === 'patient');
+      
+      if (existingPatient) {
+        hideLoading();
+        showToast('NIK sudah terdaftar!');
+        return;
+      }
+      
+      // Buat objek data pasien baru
+      const patientData = {
+        nik: nik,
+        nama_lengkap: document.getElementById('regNama').value,
+        tanggal_lahir: document.getElementById('regTanggalLahir').value,
+        jenis_kelamin: document.getElementById('regJenisKelamin').value,
+        alamat: document.getElementById('regAlamat').value,
+        nomor_telepon: document.getElementById('regTelepon').value,
+        email: document.getElementById('regEmail').value,
+        jenis_skrining: '',
+        tanggal_skrining: '',
+        tahun_skrining: 0,
+        jawaban_skrining: '',
+        status: 'registered',
+        role: 'patient'
+      };
+      
+      // Simpan ke Canva Sheet
+      const result = await window.dataSdk.create(patientData);
+      
+      if (result.isOk) {
+        showToast('Pendaftaran berhasil! Mengarahkan ke dashboard...');
+        
+        // Auto-login pasien yang baru daftar
+        // Cari data yang baru disimpan (dengan __backendId)
+        setTimeout(() => {
+          const savedPatient = allData.find(d => d.nik === nik && d.role === 'patient');
+          if (savedPatient) {
+            currentUser = savedPatient;
+            document.getElementById('welcomeMessage').textContent = `Selamat datang, ${savedPatient.nama_lengkap}`;
+          }
+          
+          // Reset form
+          document.getElementById('registrationForm').reset();
+          
+          showScreen('patientDashboard');
+          updatePatientHistory();
+        }, 500);
+      } else {
+        showToast('Gagal menyimpan data: ' + result.error.message);
+      }
+      
+      hideLoading();
+    });
+
+    // ==========================================
+    // BAGIAN 6: FORM LOGIN PASIEN
+    // ==========================================
+    
+    /**
+     * FORM: Login Pasien
+     * KEGUNAAN: Verifikasi NIK dan Tanggal Lahir pasien untuk login
+     * VALIDASI: NIK dan tanggal lahir harus cocok dengan data yang terdaftar
+     */
+    document.getElementById('patientLoginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      // Ambil data input dari form
+      const nik = document.getElementById('loginNik').value;
+      const tanggalLahir = document.getElementById('loginTanggalLahir').value;
+      
+      // Cari pasien dengan NIK dan tanggal lahir yang cocok
+      const patient = allData.find(d => d.nik === nik && d.tanggal_lahir === tanggalLahir && d.role === 'patient');
+      
+      if (patient) {
+        // Login berhasil
+        currentUser = patient;
+        document.getElementById('welcomeMessage').textContent = `Selamat datang, ${patient.nama_lengkap}`;
+        showScreen('patientDashboard');
+        updatePatientHistory(); // Tampilkan riwayat skrining pasien
+      } else {
+        // Login gagal - tampilkan pesan error
+        document.getElementById('loginError').textContent = 'NIK atau Tanggal Lahir tidak valid';
+        document.getElementById('loginError').classList.remove('hidden');
+      }
+    });
+
+    // ==========================================
+    // BAGIAN 7: FORM LOGIN ADMIN
+    // ==========================================
+    
+    /**
+     * FORM: Login Admin
+     * KEGUNAAN: Verifikasi username dan password admin
+     * KREDENSIAL DEFAULT: 
+     *   Username: admin
+     *   Password: admin123
+     * CARA EDIT KREDENSIAL: Ubah nilai 'admin' dan 'admin123' di bawah ini
+     */
+    document.getElementById('adminLoginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('adminUsername').value;
+      const password = document.getElementById('adminPassword').value;
+      
+      // EDIT DISINI untuk mengubah username dan password admin
+      if (username === 'admin' && password === 'admin123') {
+        adminLoggedIn = true;
+        showScreen('adminDashboard');
+        updateAdminDashboard(); // Tampilkan data statistik dan tabel
+      } else {
+        document.getElementById('adminLoginError').textContent = 'Username atau Password salah';
+        document.getElementById('adminLoginError').classList.remove('hidden');
+      }
+    });
+
+    // ==========================================
+    // BAGIAN 8: PILIH JENIS SKRINING
+    // ==========================================
+    
+    /**
+     * TOMBOL: Kartu Skrining (Diabetes, Hipertensi, Kolesterol, Kanker)
+     * KEGUNAAN: Ketika pasien memilih salah satu jenis skrining
+     * VALIDASI: Cek apakah pasien sudah melakukan skrining yang sama di tahun ini
+     */
+    document.querySelectorAll('.screening-card').forEach(card => {
+      card.addEventListener('click', () => {
+        // Ambil jenis skrining dari atribut data-screening
+        const screeningType = card.getAttribute('data-screening');
+        const currentYear = new Date().getFullYear();
+        
+        // Cek apakah pasien sudah melakukan skrining ini di tahun yang sama
+        const existingScreening = allData.find(d => 
+          d.nik === currentUser.nik && 
+          d.jenis_skrining === screeningType && 
+          d.tahun_skrining === currentYear
+        );
+        
+        if (existingScreening) {
+          // Jika sudah pernah skrining tahun ini, tampilkan notifikasi
+          showToast(`Anda sudah melakukan ${screeningType} tahun ini`);
+          return;
+        }
+        
+        // Jika belum pernah, lanjut ke form skrining
+        currentScreeningType = screeningType;
+        document.getElementById('screeningTitle').textContent = screeningType;
+        
+        // Muat pertanyaan sesuai jenis skrining
+        loadScreeningQuestions(screeningType);
+        
+        showScreen('screeningForm');
+      });
+    });
+
+    // ==========================================
+    // BAGIAN 9: FORM SKRINING (PERTANYAAN KESEHATAN)
+    // ==========================================
+    
+    /**
+     * FORM: Submit Skrining
+     * KEGUNAAN: Menyimpan hasil jawaban skrining pasien ke Canva Sheet
+     * PERTANYAAN: Dinamis tergantung jenis skrining yang dipilih
+     * CARA EDIT PERTANYAAN: Edit objek screeningQuestions di BAGIAN 1.5
+     */
+    document.getElementById('screeningQuestionsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (!sdkReady) {
+        showToast('Sistem belum siap. Silakan tunggu sebentar...');
+        return;
+      }
+      
+      // Cek limit maksimal data
+      if (allData.length >= 999) {
+        showToast('Batas maksimum 999 data tercapai. Hubungi administrator.');
+        return;
+      }
+      
+      // Tampilkan loading
+      const hideLoading = showLoading(document.getElementById('btnSubmitScreening'));
+      
+      // Ambil semua pertanyaan untuk jenis skrining ini
+      const questions = screeningQuestions[currentScreeningType] || [];
+      
+      // Kumpulkan semua jawaban dari form (pilihan ganda)
+      const answers = {};
+      questions.forEach(q => {
+        const selectedOption = document.querySelector(`input[name="${q.id}"]:checked`);
+        if (selectedOption) {
+          answers[q.id] = selectedOption.value;
+        }
+      });
+      
+      const today = new Date();
+      
+      // Buat objek data skrining baru
+      const screeningData = {
+        nik: currentUser.nik,
+        nama_lengkap: currentUser.nama_lengkap,
+        tanggal_lahir: currentUser.tanggal_lahir,
+        jenis_kelamin: currentUser.jenis_kelamin,
+        alamat: currentUser.alamat,
+        nomor_telepon: currentUser.nomor_telepon,
+        email: currentUser.email,
+        jenis_skrining: currentScreeningType,
+        tanggal_skrining: today.toISOString(),
+        tahun_skrining: today.getFullYear(),
+        jawaban_skrining: JSON.stringify(answers),
+        status: 'completed',
+        role: 'screening'
+      };
+      
+      // Simpan ke Canva Sheet
+      const result = await window.dataSdk.create(screeningData);
+      
+      if (result.isOk) {
+        showToast('Skrining berhasil dikirim!');
+        
+        // Reset form
+        document.getElementById('screeningQuestionsForm').reset();
+        
+        // Kembali ke dashboard
+        showScreen('patientDashboard');
+        updatePatientHistory();
+      } else {
+        showToast('Gagal menyimpan data: ' + result.error.message);
+      }
+      
+      hideLoading();
+    });
+
+    /**
+     * TOMBOL: Batal Skrining
+     * KEGUNAAN: Membatalkan pengisian form skrining dan kembali ke dashboard
+     */
+    document.getElementById('btnCancelScreening').addEventListener('click', () => {
+      document.getElementById('screeningQuestionsForm').reset();
+      showScreen('patientDashboard');
+    });
+
+    // ==========================================
+    // BAGIAN 10: TOMBOL LOGOUT
+    // ==========================================
+    
+    /**
+     * TOMBOL: Logout Pasien
+     * KEGUNAAN: Keluar dari dashboard pasien dan kembali ke layar login utama
+     */
+    document.getElementById('btnLogoutPatient').addEventListener('click', () => {
+      currentUser = null; // Hapus data user yang sedang login
+      showScreen('loginScreen');
+    });
+
+    /**
+     * TOMBOL: Logout Admin
+     * KEGUNAAN: Keluar dari dashboard admin dan kembali ke layar login utama
+     */
+    document.getElementById('btnLogoutAdmin').addEventListener('click', () => {
+      adminLoggedIn = false; // Set status admin menjadi tidak login
+      showScreen('loginScreen');
+    });
+
+    // ==========================================
+    // BAGIAN 11: FUNGSI TAMPILAN RIWAYAT SKRINING PASIEN
+    // ==========================================
+    
+    /**
+     * FUNGSI: updatePatientHistory()
+     * KEGUNAAN: Menampilkan riwayat skrining pasien yang sedang login
+     * TAMPILAN: Menampilkan kartu untuk setiap skrining yang pernah dilakukan
+     */
+    function updatePatientHistory() {
+      const historyContainer = document.getElementById('patientHistory');
+      
+      // Filter data skrining berdasarkan NIK pasien yang sedang login
+      const patientScreenings = allData.filter(d => d.nik === currentUser.nik && d.role === 'screening');
+      
+      // Jika belum ada riwayat skrining
+      if (patientScreenings.length === 0) {
+        historyContainer.innerHTML = '<p class="text-gray-500 text-center py-4">Belum ada riwayat skrining</p>';
+        return;
+      }
+      
+      // Tampilkan setiap riwayat skrining dalam bentuk kartu
+      historyContainer.innerHTML = patientScreenings.map(screening => {
+        const date = new Date(screening.tanggal_skrining);
+        return `
+          <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div class="flex justify-between items-center">
+              <div>
+                <div class="font-semibold text-gray-800">${screening.jenis_skrining}</div>
+                <div class="text-sm text-gray-600">${date.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+              </div>
+              <span class="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full">Selesai</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ==========================================
+    // BAGIAN 12: FUNGSI DASHBOARD ADMIN
+    // ==========================================
+    
+    /**
+     * FUNGSI: updateAdminDashboard()
+     * KEGUNAAN: Menampilkan statistik dan tabel data skrining di dashboard admin
+     * STATISTIK:
+     *   - Skrining Selesai: Total skrining yang telah dilakukan
+     *   - Skrining Bulan Ini: Jumlah skrining di bulan dan tahun berjalan
+     */
+    function updateAdminDashboard() {
+      // Filter semua data skrining
+      const screenings = allData.filter(d => d.role === 'screening');
+      
+      // Hitung skrining bulan ini
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      const monthlyScreenings = screenings.filter(s => {
+        const date = new Date(s.tanggal_skrining);
+        return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+      });
+      
+      // Update tampilan statistik
+      document.getElementById('completedScreenings').textContent = screenings.length;
+      document.getElementById('monthlyScreenings').textContent = monthlyScreenings.length;
+      
+      // Tampilkan tabel data skrining
+      renderAdminTable(screenings);
+    }
+
+    // ==========================================
+    // BAGIAN 13: FUNGSI RENDER TABEL ADMIN (DIKELOMPOKKAN PER PASIEN)
+    // ==========================================
+    
+    /**
+     * FUNGSI: renderAdminTable(screenings)
+     * KEGUNAAN: Menampilkan data pasien beserta semua riwayat skriningnya
+     * PARAMETER: screenings - Array data skrining yang akan ditampilkan
+     * TAMPILAN: Data pasien di card header, list skrining di bawahnya
+     * TOMBOL AKSI:
+     *   - Edit Pasien: Mengubah data pasien
+     *   - Hapus Pasien: Menghapus pasien dan semua riwayat skriningnya
+     *   - Lihat Detail: Menampilkan detail lengkap skrining
+     *   - Edit Skrining: Mengubah jawaban skrining
+     *   - Hapus Skrining: Menghapus data skrining saja
+     */
+    function renderAdminTable(screenings) {
+      const container = document.getElementById('adminTableBody');
+      
+      // Jika tidak ada data skrining
+      if (screenings.length === 0) {
+        container.innerHTML = '<div class="text-center py-8 text-gray-500 bg-white rounded-lg">Belum ada data skrining</div>';
+        return;
+      }
+      
+      // Kelompokkan skrining berdasarkan NIK pasien
+      const patientGroups = {};
+      screenings.forEach(screening => {
+        if (!patientGroups[screening.nik]) {
+          patientGroups[screening.nik] = {
+            patient: screening, // Data pasien
+            screenings: [] // Array riwayat skrining
+          };
+        }
+        patientGroups[screening.nik].screenings.push(screening);
+      });
+      
+      // Buat card untuk setiap pasien
+      container.innerHTML = Object.values(patientGroups).map(group => {
+        const patient = group.patient;
+        const patientScreenings = group.screenings;
+        
+        return `
+          <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <!-- Header Card: Info Pasien -->
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4 text-white">
+              <div class="flex justify-between items-start">
+                <div class="flex-1">
+                  <h3 class="text-xl font-bold mb-2">${patient.nama_lengkap}</h3>
+                  <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-blue-50">
+                    <div><span class="font-semibold">NIK:</span> ${patient.nik}</div>
+                    <div><span class="font-semibold">Jenis Kelamin:</span> ${patient.jenis_kelamin}</div>
+                    <div><span class="font-semibold">Tanggal Lahir:</span> ${new Date(patient.tanggal_lahir).toLocaleDateString('id-ID')}</div>
+                    <div><span class="font-semibold">Telepon:</span> ${patient.nomor_telepon}</div>
+                  </div>
+                </div>
+                <div class="flex gap-2 ml-4">
+                  <button class="edit-patient bg-white hover:bg-blue-50 text-blue-600 p-2 rounded transition-colors duration-200" data-nik="${patient.nik}" title="Edit Data Pasien">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button class="delete-patient bg-red-500 hover:bg-red-600 text-white p-2 rounded transition-colors duration-200" data-nik="${patient.nik}" title="Hapus Pasien & Semua Skrining">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Body Card: Riwayat Skrining -->
+            <div class="p-4">
+              <h4 class="font-semibold text-gray-700 mb-3">Riwayat Skrining (${patientScreenings.length})</h4>
+              <div class="space-y-2">
+                ${patientScreenings.map(screening => {
+                  const date = new Date(screening.tanggal_skrining);
+                  return `
+                    <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors">
+                      <div class="flex-1">
+                        <div class="flex items-center gap-3">
+                          <span class="font-semibold text-gray-800">${screening.jenis_skrining}</span>
+                          <span class="text-sm text-gray-600">${date.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                          <span class="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded-full">Selesai</span>
+                        </div>
+                      </div>
+                      <div class="flex gap-2">
+                        <button class="view-detail bg-blue-500 hover:bg-blue-600 text-white p-2 rounded transition-colors duration-200" data-id="${screening.__backendId}" title="Lihat Detail">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        </button>
+                        <button class="edit-screening bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded transition-colors duration-200" data-id="${screening.__backendId}" title="Edit Hasil Skrining">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                        <button class="delete-screening bg-red-500 hover:bg-red-600 text-white p-2 rounded transition-colors duration-200" data-id="${screening.__backendId}" title="Hapus Skrining">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      // ===== TAMBAHKAN EVENT LISTENER UNTUK SEMUA TOMBOL =====
+      
+      // Tombol Edit Pasien
+      document.querySelectorAll('.edit-patient').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const button = e.target.closest('button');
+          const nik = button.getAttribute('data-nik');
+          showEditPatientModal(nik);
+        });
+      });
+      
+      // Tombol Hapus Pasien
+      document.querySelectorAll('.delete-patient').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const button = e.target.closest('button');
+          const nik = button.getAttribute('data-nik');
+          showDeletePatientConfirmation(nik);
+        });
+      });
+      
+      // Tombol Lihat Detail Skrining
+      document.querySelectorAll('.view-detail').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const button = e.target.closest('button');
+          const id = button.getAttribute('data-id');
+          showScreeningDetail(id);
+        });
+      });
+      
+      // Tombol Edit Skrining
+      document.querySelectorAll('.edit-screening').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const button = e.target.closest('button');
+          const id = button.getAttribute('data-id');
+          showEditScreeningModal(id);
+        });
+      });
+      
+      // Tombol Hapus Skrining
+      document.querySelectorAll('.delete-screening').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const button = e.target.closest('button');
+          const id = button.getAttribute('data-id');
+          showDeleteConfirmation(id);
+        });
+      });
+    }
+
+    // ==========================================
+    // BAGIAN 14: MODAL DETAIL SKRINING
+    // ==========================================
+    
+    /**
+     * FUNGSI: showScreeningDetail(backendId)
+     * KEGUNAAN: Menampilkan detail lengkap skrining dalam modal popup
+     * PARAMETER: backendId - Backend ID dari data skrining yang akan ditampilkan
+     * TAMPILAN: Data pasien + semua jawaban skrining dengan label yang sesuai
+     */
+    function showScreeningDetail(backendId) {
+      const screening = allData.find(d => d.__backendId === backendId);
+      if (!screening) return;
+      
+      // Parse jawaban dari JSON string
+      const answers = JSON.parse(screening.jawaban_skrining);
+      const date = new Date(screening.tanggal_skrining);
+      
+      // Ambil pertanyaan untuk jenis skrining ini
+      const questions = screeningQuestions[screening.jenis_skrining] || [];
+      
+      const modalContent = document.getElementById('modalContent');
+      modalContent.innerHTML = `
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <div class="text-sm font-medium text-gray-500">NIK</div>
+              <div class="text-gray-800">${screening.nik}</div>
+            </div>
+            <div>
+              <div class="text-sm font-medium text-gray-500">Nama Lengkap</div>
+              <div class="text-gray-800">${screening.nama_lengkap}</div>
+            </div>
+            <div>
+              <div class="text-sm font-medium text-gray-500">Tanggal Lahir</div>
+              <div class="text-gray-800">${new Date(screening.tanggal_lahir).toLocaleDateString('id-ID')}</div>
+            </div>
+            <div>
+              <div class="text-sm font-medium text-gray-500">Jenis Kelamin</div>
+              <div class="text-gray-800">${screening.jenis_kelamin}</div>
+            </div>
+            <div>
+              <div class="text-sm font-medium text-gray-500">Nomor Telepon</div>
+              <div class="text-gray-800">${screening.nomor_telepon}</div>
+            </div>
+            <div>
+              <div class="text-sm font-medium text-gray-500">Email</div>
+              <div class="text-gray-800">${screening.email}</div>
+            </div>
+            <div class="col-span-2">
+              <div class="text-sm font-medium text-gray-500">Alamat</div>
+              <div class="text-gray-800">${screening.alamat}</div>
+            </div>
+          </div>
+          
+          <div class="border-t pt-4 mt-4">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+              <div class="flex justify-between items-center">
+                <div class="font-semibold text-blue-900">${screening.jenis_skrining}</div>
+                <div class="text-sm text-blue-700">${date.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+              </div>
+            </div>
+            
+            <div class="space-y-3">
+              ${questions.map(q => `
+                <div>
+                  <div class="text-sm font-medium text-gray-700 mb-1">${q.label}</div>
+                  <div class="bg-gray-50 rounded p-3 text-sm text-gray-800">${answers[q.id] || '-'}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Tampilkan modal
+      document.getElementById('detailModal').classList.remove('hidden');
+    }
+
+    /**
+     * TOMBOL: Tutup Modal Detail
+     * KEGUNAAN: Menutup popup detail skrining
+     */
+    document.getElementById('btnCloseModal').addEventListener('click', () => {
+      document.getElementById('detailModal').classList.add('hidden');
+    });
+
+    document.getElementById('btnCloseEditModal').addEventListener('click', () => {
+      document.getElementById('editPatientModal').classList.add('hidden');
+      editingPatientId = null;
+    });
+
+    document.getElementById('btnCancelEdit').addEventListener('click', () => {
+      document.getElementById('editPatientModal').classList.add('hidden');
+      editingPatientId = null;
+    });
+
+    function showEditScreeningModal(backendId) {
+      const screening = allData.find(d => d.__backendId === backendId);
+      if (!screening) return;
+      
+      editingScreeningId = backendId;
+      const answers = JSON.parse(screening.jawaban_skrining);
+      
+      // Ambil pertanyaan untuk jenis skrining ini
+      const questions = screeningQuestions[screening.jenis_skrining] || [];
+      
+      document.getElementById('editScreeningPatient').textContent = screening.nama_lengkap;
+      document.getElementById('editScreeningType').textContent = screening.jenis_skrining;
+      
+      // Buat form pertanyaan dinamis
+      const formContainer = document.getElementById('editScreeningForm');
+      
+      // Hapus pertanyaan lama (kecuali info pasien dan tombol submit)
+      const oldQuestions = formContainer.querySelectorAll('.dynamic-question');
+      oldQuestions.forEach(q => q.remove());
+      
+      // Sisipkan pertanyaan baru sebelum tombol submit
+      const submitButtonContainer = formContainer.querySelector('.flex.gap-4');
+      
+      questions.forEach(q => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'dynamic-question';
+        questionDiv.innerHTML = `
+          <label class="block text-sm font-medium text-gray-700 mb-3">
+            ${q.label}
+            ${q.required ? '<span class="text-red-500">*</span>' : ''}
+          </label>
+          <div class="space-y-2">
+            ${q.options.map((option, index) => `
+              <label class="flex items-start p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer border border-gray-200 transition-colors">
+                <input type="${q.type}" name="edit${q.id}" value="${option}" ${q.required ? 'required' : ''} ${answers[q.id] === option ? 'checked' : ''} class="mt-1 mr-3 w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500">
+                <span class="text-sm text-gray-700 flex-1">${option}</span>
+              </label>
+            `).join('')}
+          </div>
+        `;
+        formContainer.insertBefore(questionDiv, submitButtonContainer);
+      });
+      
+      document.getElementById('editScreeningModal').classList.remove('hidden');
+    }
+
+    document.getElementById('btnCloseEditScreeningModal').addEventListener('click', () => {
+      document.getElementById('editScreeningModal').classList.add('hidden');
+      editingScreeningId = null;
+    });
+
+    document.getElementById('btnCancelScreeningEdit').addEventListener('click', () => {
+      document.getElementById('editScreeningModal').classList.add('hidden');
+      editingScreeningId = null;
+    });
+
+    document.getElementById('editScreeningForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (!editingScreeningId || !sdkReady) return;
+      
+      const hideLoading = showLoading(document.getElementById('btnSaveScreeningEdit'));
+      
+      // Cari data skrining yang sedang diedit
+      const screening = allData.find(d => d.__backendId === editingScreeningId);
+      if (!screening) {
+        hideLoading();
+        return;
+      }
+      
+      // Ambil pertanyaan untuk jenis skrining ini
+      const questions = screeningQuestions[screening.jenis_skrining] || [];
+      
+      // Kumpulkan jawaban yang telah diedit (pilihan ganda)
+      const updatedAnswers = {};
+      questions.forEach(q => {
+        const selectedOption = document.querySelector(`input[name="edit${q.id}"]:checked`);
+        if (selectedOption) {
+          updatedAnswers[q.id] = selectedOption.value;
+        }
+      });
+      
+      // Update di Canva Sheet
+      const result = await window.dataSdk.update({
+        ...screening,
+        jawaban_skrining: JSON.stringify(updatedAnswers)
+      });
+      
+      if (result.isOk) {
+        showToast('Hasil skrining berhasil diperbarui!');
+        document.getElementById('editScreeningModal').classList.add('hidden');
+        editingScreeningId = null;
+      } else {
+        showToast('Gagal mengupdate data skrining');
+      }
+      
+      hideLoading();
+    });
+
+    function showEditPatientModal(nik) {
+      const patient = allData.find(d => d.nik === nik && d.role === 'patient');
+      if (!patient) return;
+      
+      editingPatientId = patient.__backendId;
+      document.getElementById('editNik').value = patient.nik;
+      document.getElementById('editNama').value = patient.nama_lengkap;
+      document.getElementById('editTanggalLahir').value = patient.tanggal_lahir;
+      document.getElementById('editJenisKelamin').value = patient.jenis_kelamin;
+      document.getElementById('editAlamat').value = patient.alamat;
+      document.getElementById('editTelepon').value = patient.nomor_telepon;
+      document.getElementById('editEmail').value = patient.email;
+      
+      document.getElementById('editPatientModal').classList.remove('hidden');
+    }
+
+    document.getElementById('editPatientForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (!editingPatientId || !sdkReady) return;
+      
+      const hideLoading = showLoading(document.getElementById('btnSaveEdit'));
+      
+      const nik = document.getElementById('editNik').value;
+      const updatedData = {
+        nama_lengkap: document.getElementById('editNama').value,
+        tanggal_lahir: document.getElementById('editTanggalLahir').value,
+        jenis_kelamin: document.getElementById('editJenisKelamin').value,
+        alamat: document.getElementById('editAlamat').value,
+        nomor_telepon: document.getElementById('editTelepon').value,
+        email: document.getElementById('editEmail').value
+      };
+      
+      // Update data pasien di Sheet
+      const patient = allData.find(d => d.__backendId === editingPatientId);
+      if (patient) {
+        const result = await window.dataSdk.update({
+          ...patient,
+          ...updatedData
+        });
+        
+        if (!result.isOk) {
+          hideLoading();
+          showToast('Gagal mengupdate data pasien');
+          return;
+        }
+      }
+      
+      // Update semua data skrining pasien ini di Sheet
+      const screenings = allData.filter(d => d.nik === nik && d.role === 'screening');
+      for (const screening of screenings) {
+        await window.dataSdk.update({
+          ...screening,
+          ...updatedData
+        });
+      }
+      
+      hideLoading();
+      showToast('Data pasien berhasil diperbarui!');
+      document.getElementById('editPatientModal').classList.add('hidden');
+      editingPatientId = null;
+    });
+
+    document.getElementById('searchPatient').addEventListener('input', (e) => {
+      filterAdminTable();
+    });
+
+    document.getElementById('filterScreening').addEventListener('change', () => {
+      filterAdminTable();
+    });
+
+    function filterAdminTable() {
+      const searchTerm = document.getElementById('searchPatient').value.toLowerCase();
+      const filterType = document.getElementById('filterScreening').value;
+      
+      let filtered = allData.filter(d => d.role === 'screening');
+      
+      if (searchTerm) {
+        filtered = filtered.filter(d => 
+          d.nik.toLowerCase().includes(searchTerm) || 
+          d.nama_lengkap.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      if (filterType) {
+        filtered = filtered.filter(d => d.jenis_skrining === filterType);
+      }
+      
+      renderAdminTable(filtered);
+    }
+
+    function showDeleteConfirmation(backendId) {
+      const screening = allData.find(d => d.__backendId === backendId);
+      if (!screening) return;
+      
+      deletingItemId = backendId;
+      deletingType = 'screening';
+      document.getElementById('deleteMessage').textContent = 
+        `Apakah Anda yakin ingin menghapus data skrining ${screening.jenis_skrining} untuk pasien ${screening.nama_lengkap}?`;
+      document.getElementById('deleteConfirmModal').classList.remove('hidden');
+    }
+
+    function showDeletePatientConfirmation(nik) {
+      const patient = allData.find(d => d.nik === nik && d.role === 'patient');
+      if (!patient) return;
+      
+      const screeningCount = allData.filter(d => d.nik === nik && d.role === 'screening').length;
+      
+      deletingItemId = nik;
+      deletingType = 'patient';
+      document.getElementById('deleteMessage').textContent = 
+        `Apakah Anda yakin ingin menghapus pasien ${patient.nama_lengkap}? Ini akan menghapus data pasien dan semua ${screeningCount} riwayat skrining terkait.`;
+      document.getElementById('deleteConfirmModal').classList.remove('hidden');
+    }
+
+    document.getElementById('btnCancelDelete').addEventListener('click', () => {
+      document.getElementById('deleteConfirmModal').classList.add('hidden');
+      deletingItemId = null;
+      deletingType = 'screening';
+    });
+
+    document.getElementById('btnConfirmDelete').addEventListener('click', async () => {
+      if (!deletingItemId || !sdkReady) return;
+      
+      const hideLoading = showLoading(document.getElementById('btnConfirmDelete'));
+      
+      if (deletingType === 'screening') {
+        // Hapus data skrining saja dari Sheet
+        const screening = allData.find(d => d.__backendId === deletingItemId);
+        if (screening) {
+          const result = await window.dataSdk.delete(screening);
+          if (result.isOk) {
+            showToast('Data skrining berhasil dihapus!');
+          } else {
+            showToast('Gagal menghapus data skrining');
+          }
+        }
+      } else if (deletingType === 'patient') {
+        // Hapus data pasien dan semua skrining terkait dari Sheet
+        const nik = deletingItemId;
+        const itemsToDelete = allData.filter(d => d.nik === nik);
+        
+        for (const item of itemsToDelete) {
+          await window.dataSdk.delete(item);
+        }
+        
+        showToast('Data pasien dan semua riwayat skrining berhasil dihapus!');
+      }
+      
+      hideLoading();
+      document.getElementById('deleteConfirmModal').classList.add('hidden');
+      deletingItemId = null;
+      deletingType = 'screening';
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b9c2c8020039d1e',t:'MTc2NzcxMjU1OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
